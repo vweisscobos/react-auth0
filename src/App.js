@@ -1,10 +1,14 @@
 import React, { Component } from 'react';
 import './App.css';
-import { Switch, Route, NavLink, Redirect } from 'react-router-dom';
+import { Switch, Route, Redirect } from 'react-router-dom';
 import Home from './components/Home';
 import Profile from './components/Profile';
 import Auth from './auth/Auth';
 import Callback from './components/Callback';
+import Header from './components/Header';
+import Public from './components/Public';
+import Private from './components/Private';
+import Courses from './components/Courses';
 
 class App extends Component {
 
@@ -15,23 +19,10 @@ class App extends Component {
   }
 
   render() {
-    const {
-      isAuthenticated,
-      login,
-      logout
-    } = this.auth;
 
     return (
       <div className={'App'}>
-        <nav  className='header'>
-          <ul className='header-link-container'>
-            <li className='header-link-item'><NavLink to='/'>Home</NavLink></li>
-            <li className='header-link-item'><NavLink to='/profile'>Profile</NavLink></li>
-            <li className='header-link-item' onClick={isAuthenticated() ? logout : login}>
-              {isAuthenticated() ? "Log Out" : "Log In"}
-            </li>
-          </ul>
-        </nav>
+        <Header auth={this.auth}></Header>
         <div className={'body'}>
           <Switch>
             <Route
@@ -51,6 +42,30 @@ class App extends Component {
             <Route
               path={'/callback'}
               render={props => <Callback auth={this.auth} {...props} />}
+            />
+            <Route
+              path={'/public'}
+              render={props => <Public auth={this.auth} {...props} />}
+            />
+            <Route
+              path={'/private'}
+              render={props =>
+                this.auth.isAuthenticated() ? (
+                  <Private auth={this.auth} {...props} />
+                ) : (
+                  this.auth.login()  
+                )
+            }
+            />
+            <Route
+              path={'/courses'}
+              render={props =>
+                this.auth.isAuthenticated() && this.auth.userHasScopes(['read:courses']) ? (
+                  <Courses auth={this.auth} {...props} />
+                ) : (
+                  this.auth.login()  
+                )
+              }
             />
           </Switch>
         </div>
