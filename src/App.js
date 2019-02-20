@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
-import { Switch, Route, NavLink } from 'react-router-dom';
+import { Switch, Route, NavLink, Redirect } from 'react-router-dom';
 import Home from './components/Home';
 import Profile from './components/Profile';
 import Auth from './auth/Auth';
@@ -34,9 +34,24 @@ class App extends Component {
         </nav>
         <div className={'body'}>
           <Switch>
-            <Route exact path={'/'} render={props => <Home auth={this.auth} {...props}/>}/>
-            <Route path={'/profile'} render={props => <Profile auth={this.auth} {...props}/>}/>
-            <Route path={'/callback'} render={props => <Callback auth={this.auth} {...props} />}/>
+            <Route
+              exact path={'/'}
+              render={props => <Home auth={this.auth} {...props}/>}
+            />
+            <Route
+              path={'/profile'}
+              render={props =>
+                this.auth.isAuthenticated() ? (
+                  <Profile auth={this.auth} {...props} />
+                ) : (
+                  <Redirect to='/'/>
+                )
+              }
+            />
+            <Route
+              path={'/callback'}
+              render={props => <Callback auth={this.auth} {...props} />}
+            />
           </Switch>
         </div>
       </div>
