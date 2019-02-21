@@ -9,6 +9,7 @@ import Header from './components/Header';
 import Public from './components/Public';
 import Private from './components/Private';
 import Courses from './components/Courses';
+import PrivateRoute from './components/PrivateRoute';
 
 class App extends Component {
 
@@ -22,22 +23,17 @@ class App extends Component {
 
     return (
       <div className={'App'}>
-        <Header auth={this.auth}></Header>
+        <Header auth={this.auth} />
         <div className={'body'}>
           <Switch>
             <Route
               exact path={'/'}
               render={props => <Home auth={this.auth} {...props}/>}
             />
-            <Route
+            <PrivateRoute
               path={'/profile'}
-              render={props =>
-                this.auth.isAuthenticated() ? (
-                  <Profile auth={this.auth} {...props} />
-                ) : (
-                  <Redirect to='/'/>
-                )
-              }
+              component={Profile}
+              auth={this.auth}
             />
             <Route
               path={'/callback'}
@@ -47,25 +43,16 @@ class App extends Component {
               path={'/public'}
               render={props => <Public auth={this.auth} {...props} />}
             />
-            <Route
+            <PrivateRoute
               path={'/private'}
-              render={props =>
-                this.auth.isAuthenticated() ? (
-                  <Private auth={this.auth} {...props} />
-                ) : (
-                  this.auth.login()  
-                )
-            }
+              component={Private}
+              auth={this.auth}
             />
-            <Route
+            <PrivateRoute
               path={'/courses'}
-              render={props =>
-                this.auth.isAuthenticated() && this.auth.userHasScopes(['read:courses']) ? (
-                  <Courses auth={this.auth} {...props} />
-                ) : (
-                  this.auth.login()  
-                )
-              }
+              component={Courses}
+              auth={this.auth}
+              scopes={["read:courses"]}
             />
           </Switch>
         </div>
