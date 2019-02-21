@@ -10,53 +10,56 @@ import Public from './components/Public';
 import Private from './components/Private';
 import Courses from './components/Courses';
 import PrivateRoute from './components/PrivateRoute';
+import AuthContext from './AuthContext';
+
 
 class App extends Component {
 
   constructor(props) {
     super(props);
 
-    this.auth = new Auth(this.props.history);
+    this.state = {
+      auth: new Auth(this.props.history)
+    };
   }
 
   render() {
 
+    const { auth } = this.state;
+
     return (
-      <div className={'App'}>
-        <Header auth={this.auth} />
+      <AuthContext.Provider value={auth}>
+        <Header auth={auth} />
         <div className={'body'}>
           <Switch>
             <Route
               exact path={'/'}
-              render={props => <Home auth={this.auth} {...props}/>}
+              render={props => <Home auth={auth} {...props}/>}
             />
             <PrivateRoute
               path={'/profile'}
               component={Profile}
-              auth={this.auth}
             />
             <Route
               path={'/callback'}
-              render={props => <Callback auth={this.auth} {...props} />}
+              render={props => <Callback auth={auth} {...props} />}
             />
             <Route
               path={'/public'}
-              render={props => <Public auth={this.auth} {...props} />}
+              render={props => <Public auth={auth} {...props} />}
             />
             <PrivateRoute
               path={'/private'}
               component={Private}
-              auth={this.auth}
             />
             <PrivateRoute
               path={'/courses'}
               component={Courses}
-              auth={this.auth}
               scopes={["read:courses"]}
             />
           </Switch>
         </div>
-      </div>
+      </AuthContext.Provider>
     );
   }
 }
